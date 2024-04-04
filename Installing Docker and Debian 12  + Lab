@@ -1,0 +1,89 @@
+# Installing Docker and Debian 12 sure provider "VirtualBox"
+Vagrant.configure('2') do |config|
+    config.vm.box = "chaifeng/debian-12-docker-23.0.3"
+    config.vm.box_version = "202306.13.0"
+    config.vm.box_url = "https://app.vagrantup.com/chaifeng/boxes/debian-12-docker-23.0.3"
+    config.vm.define "foohost" do |foohost|
+    end
+  # Virtual Machine Name
+    config.vm.provider :virtualbox do |vb|
+        vb.name = "VM_Docker-LAB"
+    end
+  end
+  # use vagrant up and ssh
+    # Create a private network, which allows host-only access to the machine
+    config.vm.provider "virtualbox" do |v|
+    v.check_guest_additions = yes
+    end
+    # using a specific IP.
+      config.vm.provider "virtualbox" do |config|
+      config.vm.network "private_network", ip: "192.168.56.1"
+    end
+      # specify provider for Hypervisor "VirtualBox"
+     config.vm.provider "virtualbox" do |vb|
+       # Display the VirtualBox GUI when booting the machine
+       vb.gui = true
+       # Customize the amount of memory on the VM:
+      vb.memory = "1024"
+     end
+      # Customize the amount of proccesor on the VM:
+      v.cpus = 2
+     end
+      config.vm.provision "shell", inline: <<-SHELL
+    # Installing wget on a Debian Linux 12
+      sudo apt-get update && apt-get install wget
+      sudo wget --version
+      cd Downloads
+      # Install Debian Linux 12 > http://archive.ubuntu.com/ubuntu/pool/main/w/wget/
+      sudo dpkg -i wget_1.21.3-1ubuntu1_amd64.deb
+      sudo wget --version
+  # Install Docker Engine on Debian
+      # Install using the apt repository
+      # Add Docker's official GPG key:
+      sudo apt-get update
+      sudo apt-get install ca-certificates curl gnupg
+      sudo install -m 0755 -d /etc/apt/keyrings
+      curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+      sudo chmod a+r /etc/apt/keyrings/docker.gpg
+      # Add the repository to Apt sources:
+  echo \
+  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  sudo apt-get update
+      # Install the Docker packages.
+      sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+  #nstall LAMP on Debian 12 via APT > https://www.linuxcapable.com/how-to-install-lamp-on-debian-linux/
+      sudo apt update && sudo apt upgrade
+      sudo apt install apache2
+      sudo apache2 -v
+      systemctl status apache2
+      sudo systemctl enable apache2 --now
+  # If you cannot access the Apache default page, especially using the UFW Firewall, 
+  # you might need to permit traffic on port 80. This port is standard for HTTP web traffic. To allow port 80, input the following command:
+      sudo iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+  #Install MariaDB on Debian via APT Command
+      sudo apt install mariadb-server mariadb-client
+      sudo mariadb --version
+      sudo systemctl status mariadb
+      sudo systemctl enable mariadb --now
+  
+      # Automating mysql_secure_installation > https://bertvv.github.io/notes-to-self/2015/11/16/automating-mysql_secure_installation/
+      #sudo wget https://github.com/lido936s/docker_lab/blob/main/Automating mysql_secure_installation.sh
+      #cd Downloads
+      #sudo chmod +x mysql-secure-install.sh
+      # version manualy installation 
+      sudo mysql_secure_installation
+      # https://www.techrepublic.com/article/how-to-set-change-and-recover-a-mysql-root-password/
+      ALTER USER 'root'@'localhost' IDENTIFIED BY 'PASSWORD';
+      sudo systemctl stop mysql
+      sudo mysqld -init-file=~/mysql-pwd
+      sudo systemctl start mysql
+      mysql -u root -p
+      # Create DATABASE
+      create database admin_ludo;
+      #CREATE USER 'utilisateur'@'ip' IDENTIFIED BY 'motdepasse';
+      #GRANT ALL PRIVILEGES ON nombasededonnées.* TO 'utilisateur'@'ip' WITH GRANT OPTION;
+      FLUSH PRIVILEGES;
+    SHELL
+  end
